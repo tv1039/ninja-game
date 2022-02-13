@@ -12,6 +12,17 @@ const key = {
 	}
 }
 
+//수리검 배열 (공격키 누를시 수리검 이동)
+const bulletComProp = {
+	launch: false,
+	arr: []
+}
+
+//가로 이동 백그라운드 지정
+const gameBackground = {
+	gameBox: document.querySelector('.game')
+}
+
 const gameProp = {
 	//화면의 넓이
 	screenWidth : window.innerWidth,
@@ -21,9 +32,20 @@ const gameProp = {
 const renderGame = () => {
 	//초당 약 60 FPS로 계속 호출 (키 값의 상태들을 체크하고 히어로의 움직임 값을 체크하고 변경해주면서 딜레이 없이 재생)
 	hero.keyMotion();
+	setGameBackground();
+//수리검 배열에 길이만큼 반복하며 수리검 이동
+	bulletComProp.arr.forEach((arr, i) => {
+		arr.moveBullet();
+	})
 	window.requestAnimationFrame(renderGame);
 	// console.log('call request'); 무한 반복 되는지 확인
+}
 
+const setGameBackground = () => {
+	//페럴렉스 이동 값 = 히어로 이동값과 동일
+	let parallexValue = Math.min(0, (hero.moveX-gameProp.screenHeight/3) * -1);
+
+	gameBackground.gameBox.style.transform = `translateX(${parallexValue}px)`;
 }
 
 const windowEvent = () => {
@@ -32,12 +54,17 @@ const windowEvent = () => {
 		key.keyDown[key.keyValue[e.which]] = true;
 		// console.log(key.keyDown);
 		// console.log('키눌림:' + e.which);
-	})
+	});
 
 	window.addEventListener('keyup', e => {
 		key.keyDown[key.keyValue[e.which]] = false;
 		// console.log(key.keyDown);
 		// console.log('키업:' + e.which);
+	});
+//resize 이벤트 (브라우저 크기 변경시 화면 비율 유지)
+	window.addEventListener('resize', e => {
+		gameProp.screenWidth = window.innerWidth;
+		gameProp.screenHeight = window.innerHeight;
 	})
 }
 //이미지 사전에 로드하기 (깜빡임 방지)
